@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>IT UDM Student Info Finder</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #222;
+        }
+
+        /* ================= HEADER ================= */
+
+        header {
+            background: linear-gradient(135deg, #a8d681, #75a943, #4c68b0);
+            background-size: 200% 200%;
+            animation: gradientShift 10s ease infinite, slideDown 0.8s ease-out;
+            padding: 45px 25px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+
+        header h1 {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            line-height: 1.15;
+            color: #ffffff;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0 #345d25, 6px 6px 12px rgba(0,0,0,0.35);
+            animation: titlePop 1s ease-out;
+        }
+
+        header p {
+            margin-top: 14px;
+            font-size: 19px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+            animation: fadeUp 1.2s ease-out 0.4s both;
+        }
+
+        /* ================= ANIMATIONS ================= */
+
+        @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-40px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes titlePop {
+            0%   { transform: scale(0.8); opacity: 0; letter-spacing: 14px; }
+            60%  { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); letter-spacing: 4px; }
+        }
+
+        @keyframes fadeUp {
+            from { transform: translateY(18px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes cardIn {
+            from { transform: translateY(24px) scale(0.96); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(117,169,67,0.5); }
+            50%      { box-shadow: 0 0 0 10px rgba(117,169,67,0); }
+        }
+
+        .page:not(.hidden) {
+            animation: fadeUp 0.5s ease-out;
+        }
+
+        .auth-container {
+            animation: cardIn 0.6s ease-out;
+        }
+
+        .welcome {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .student-card {
+            animation: cardIn 0.5s ease-out both;
+        }
+
+        .student-card:nth-child(2) { animation-delay: 0.05s; }
+        .student-card:nth-child(3) { animation-delay: 0.10s; }
+        .student-card:nth-child(4) { animation-delay: 0.15s; }
+        .student-card:nth-child(5) { animation-delay: 0.20s; }
+        .student-card:nth-child(6) { animation-delay: 0.25s; }
+        .student-card:nth-child(n+7) { animation-delay: 0.30s; }
+
+        .feedback-card {
+            animation: slideInLeft 0.45s ease-out both;
+        }
+
+        .step {
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .main-btn {
+            transition: transform 0.15s, background 0.2s;
+        }
+
+        .main-btn:hover {
+            transform: translateY(-2px);
+            animation: pulse 1.2s infinite;
+        }
+
+        .main-btn:active {
+            transform: scale(0.97);
+        }
+
+        .search-box button,
+        .remove-btn {
+            transition: transform 0.15s, background 0.2s;
+        }
+
+        .search-box button:hover,
+        .remove-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .student-avatar {
+            transition: transform 0.3s;
+        }
+
+        .student-card:hover .student-avatar {
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .search-box input:focus,
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #75a943;
+            box-shadow: 0 0 0 3px rgba(117,169,67,0.25);
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .star-select span {
+            transition: transform 0.15s, color 0.15s;
+        }
+
+        .star-select span:hover {
+            transform: scale(1.3) rotate(-8deg);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        nav {
+            background: #ffffff;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        nav button {
+            border: none;
+            background: transparent;
+            margin: 5px 12px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #345d25;
+        }
+
+        nav button {
+            position: relative;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        nav button::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 3px;
+            background: #75a943;
+            border-radius: 2px;
+            transform: scaleX(0);
+            transition: transform 0.25s ease;
+        }
+
+        nav button:hover {
+            color: #719e43;
+            transform: translateY(-2px);
+        }
+
+        nav button:hover::after {
+            transform: scaleX(1);
+        }
+
+        nav button.active {
+            color: #4f762f;
+            text-decoration: underline;
+        }
+
+        /* ================= MAIN ================= */
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .welcome {
+            background: #f4c95d;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            color: #4f762f;
+        }
+
+        /* ================= LOGIN ================= */
+
+        .auth-container {
+            max-width: 450px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4f762f;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .error-text {
+            color: #b23b3b;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        .success-text {
+            color: #2f6f4f;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .success-text.show {
+            display: block;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 12px;
+            background: #75a943;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .main-btn:hover {
+            background: #5d8c32;
+        }
+
+        .pass-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: -4px 0 15px;
+            font-size: 13px;
+        }
+
+        .show-pass {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: #444;
+            user-select: none;
+        }
+
+        .show-pass input {
+            width: auto;
+            accent-color: #75a943;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #4c68b0;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .switch {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .switch a {
+            color: #4f762f;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        .search-box button {
+            padding: 14px 22px;
+            background: #4c68b0;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-box button:hover {
+            background: #344e91;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        /* ================= STUDENT CARDS ================= */
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .student-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+        .student-header {
+            background: #a8d681;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .student-avatar {
+            width: 70px;
+            height: 70px;
+            margin: auto;
+            background: #4c68b0;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .student-header h3 {
+            margin-top: 10px;
+        }
+
+        .student-info {
+            padding: 15px;
+        }
+
+        .student-info p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .student-info strong {
+            color: #4f762f;
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #4c68b0;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view-btn:hover {
+            background: #344e91;
+        }
+
+        .remove-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #b23b3b;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .remove-btn:hover {
+            background: #8f2e2e;
+        }
+
+        /* ================= ADD STUDENT ================= */
+
+        .add-student-box {
+            border: 1px dashed #bbb;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 25px;
+            background: #fafaf7;
+        }
+
+        .add-student-box h3 {
+            color: #4f762f;
+            margin-bottom: 12px;
+        }
+
+        .add-student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .add-student-grid input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        /* ================= INSTRUCTIONS ================= */
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .step {
+            background: #eeeeee;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .step h3 {
+            color: #4f762f;
+            margin-bottom: 10px;
+        }
+
+        /* ================= FEEDBACK ================= */
+
+        .feedback-form {
+            margin-bottom: 25px;
+        }
+
+        .star-select {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .star-select span {
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .star-select span.active {
+            color: #e0a900;
+        }
+
+        .feedback-card {
+            background: #f1f1f1;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 7px;
+        }
+
+        .stars {
+            color: #e0a900;
+            margin-bottom: 5px;
+        }
+
+        .feedback-meta {
+            font-size: 12px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            background: #4c68b0;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .team {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 800px;
+            margin: 20px auto 0;
+            gap: 10px;
+        }
+
+        .team-member {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        /* ================= HIDDEN ================= */
+
+        .hidden {
+            display: none;
+        }
+
+        /* ================= MODAL ================= */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .close {
+            float: right;
+            font-size: 25px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 600px) {
+
+            header h1 {
+                font-size: 30px;
+                letter-spacing: 2px;
+            }
+
+            header p {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .team {
+                grid-template-columns: 1fr;
+            }
+
+            nav button {
+                display: block;
+                width: 100%;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header>
+    <h1>IT UDM STUDENT<br>INFO FINDER</h1>
+    <p>Universidad De Manila - Information Technology</p>
+</header>
+
+<nav id="mainNav" class="hidden">
+    <button data-page="home" onclick="showPage('home')">Home</button>
+    <button data-page="finder" onclick="showPage('finder')">Student Finder</button>
+    <button data-page="feedback" onclick="showPage('feedback')">Feedback</button>
+    <button data-page="how" onclick="showPage('how')">How To Use</button>
+    <button onclick="logout()">Logout</button>
+</nav>
+
+
+<!-- ================= LOGIN PAGE ================= -->
+
+<div id="loginPage">
+
+    <div class="auth-container">
+
+        <h2>Student Login</h2>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password">
+        </div>
+
+        <div class="pass-options">
+            <label class="show-pass">
+                <input type="checkbox" onchange="togglePassword(['loginPassword'], this.checked)">
+                Show password
+            </label>
+            <a class="forgot-link" onclick="showForgot()">Forgot password?</a>
+        </div>
+
+        <p class="error-text" id="loginError">Please enter your email and password.</p>
+
+        <button class="main-btn" onclick="login()">
+            Login
+        </button>
+
+        <div class="switch">
+            Don't have an account?
+            <a onclick="showRegister()">Create Account</a>
+        </div>
+
+        <p style="margin-top:12px; font-size:12px; color:#777; text-align:center;">
+            No account yet? Click "Create Account" first — this version checks
+            real stored accounts instead of accepting anything.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= REGISTER PAGE ================= -->
+
+<div id="registerPage" class="hidden">
+
+    <div class="auth-container">
+
+        <h2>Create New Account</h2>
+
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="registerName" placeholder="Enter your name">
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="Enter your email">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" placeholder="Create password">
+        </div>
+
+        <div class="pass-options">
+            <label class="show-pass">
+                <input type="checkbox" onchange="togglePassword(['registerPassword'], this.checked)">
+                Show password
+            </label>
+        </div>
+
+        <div class="input-group">
+            <label>Date of Birth</label>
+            <input type="date" id="registerBirth">
+        </div>
+
+        <p class="error-text" id="registerError">Please complete all fields.</p>
+        <p class="success-text" id="registerSuccess">Account created! You can log in now.</p>
+
+        <button class="main-btn" onclick="register()">
+            Sign Up
+        </button>
+
+        <div class="switch">
+            Already registered?
+            <a onclick="showLogin()">Login</a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= FORGOT PASSWORD PAGE ================= -->
+
+<div id="forgotPage" class="hidden">
+
+    <div class="auth-container">
+
+        <h2>Reset Password</h2>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="forgotEmail" placeholder="Enter your registered email">
+        </div>
+
+        <div class="input-group">
+            <label>New Password</label>
+            <input type="password" id="forgotNewPassword" placeholder="Enter new password">
+        </div>
+
+        <div class="input-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="forgotConfirmPassword" placeholder="Re-enter new password">
+        </div>
+
+        <div class="pass-options">
+            <label class="show-pass">
+                <input type="checkbox" onchange="togglePassword(['forgotNewPassword', 'forgotConfirmPassword'], this.checked)">
+                Show password
+            </label>
+        </div>
+
+        <p class="error-text" id="forgotError"></p>
+        <p class="success-text" id="forgotSuccess">Password changed! Taking you back to login...</p>
+
+        <button class="main-btn" onclick="resetPassword()">
+            Change Password
+        </button>
+
+        <div class="switch">
+            Remembered it?
+            <a onclick="showLogin()">Back to Login</a>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= MAIN SYSTEM ================= -->
+
+<div id="mainSystem" class="hidden">
+
+    <div class="container">
+
+        <div class="welcome" id="welcomeBanner">
+            Welcome to the UDM IT Student Information Finder!
+        </div>
+
+
+        <!-- HOME -->
+
+        <section id="home" class="section page">
+
+            <h2>Welcome to Student Info Finder</h2>
+
+            <p>
+                This system allows UDM Information Technology students
+                to easily search and view student information. All accounts,
+                students, and feedback are kept in memory for this session,
+                so they'll reset if you reload the page.
+            </p>
+
+            <br>
+
+            <button class="main-btn" style="width:auto; padding:12px 24px;" onclick="showPage('finder')">
+                Find a Student
+            </button>
+
+        </section>
+
+
+        <!-- STUDENT FINDER -->
+
+        <section id="finder" class="section page hidden">
+
+            <h2>Student Finder</h2>
+
+            <div class="add-student-box">
+
+                <h3>Add a Student to the Database</h3>
+
+                <div class="add-student-grid">
+                    <input type="text" id="newStudentName" placeholder="Full name">
+                    <input type="text" id="newStudentId" placeholder="Student ID (e.g. 2023-0006)">
+                    <input type="text" id="newStudentCourse" placeholder="Course">
+                    <input type="text" id="newStudentSection" placeholder="Section">
+                    <input type="text" id="newStudentYear" placeholder="Year Level">
+                </div>
+
+                <p class="error-text" id="addStudentError">Please fill in at least the name and student ID.</p>
+
+                <button class="main-btn" style="width:auto; padding:10px 20px;" onclick="addStudent()">
+                    Add Student
+                </button>
+
+                <button class="main-btn" style="width:auto; padding:10px 20px; background:#4c68b0; margin-left:10px;" onclick="generateRandomStudents(5)">
+                    Generate 5 Random Students
+                </button>
+
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by name, ID, course, or section..." oninput="renderStudents()">
+                <button onclick="renderStudents()">Search</button>
+            </div>
+
+            <div class="student-grid" id="studentGrid"></div>
+
+        </section>
+
+
+        <!-- FEEDBACK -->
+
+        <section id="feedback" class="section page hidden">
+
+            <h2>Feedback</h2>
+
+            <div class="feedback-form">
+
+                <div class="input-group">
+                    <label>Your Name</label>
+                    <input type="text" id="feedbackName" placeholder="Enter your name">
+                </div>
+
+                <label style="display:block; margin-bottom:6px; font-weight:bold;">Rating</label>
+                <div class="star-select" id="starSelect">
+                    <span data-value="1" onclick="setRating(1)">&#9733;</span>
+                    <span data-value="2" onclick="setRating(2)">&#9733;</span>
+                    <span data-value="3" onclick="setRating(3)">&#9733;</span>
+                    <span data-value="4" onclick="setRating(4)">&#9733;</span>
+                    <span data-value="5" onclick="setRating(5)">&#9733;</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Comments</label>
+                    <textarea id="feedbackComment" rows="3" placeholder="Tell us what you think..."></textarea>
+                </div>
+
+                <p class="error-text" id="feedbackError">Please add your name, a rating, and a comment.</p>
+
+                <button class="main-btn" style="width:auto; padding:10px 20px;" onclick="submitFeedback()">
+                    Submit Feedback
+                </button>
+
+            </div>
+
+            <h2 style="margin-top:10px;">What Students Are Saying</h2>
+            <div id="feedbackList"></div>
+
+        </section>
+
+
+        <!-- HOW TO USE -->
+
+        <section id="how" class="section page hidden">
+
+            <h2>How To Use This System</h2>
+
+            <div class="steps">
+
+                <div class="step">
+                    <h3>1. Create an Account</h3>
+                    <p>Register with your name, email, password, and date of birth before logging in.</p>
+                </div>
+
+                <div class="step">
+                    <h3>2. Log In</h3>
+                    <p>Use the email and password you registered with to access the system.</p>
+                </div>
+
+                <div class="step">
+                    <h3>3. Add Students</h3>
+                    <p>Go to Student Finder and fill in the "Add a Student" form to build your database.</p>
+                </div>
+
+                <div class="step">
+                    <h3>4. Search</h3>
+                    <p>Type a name, ID, course, or section into the search bar to instantly filter results.</p>
+                </div>
+
+                <div class="step">
+                    <h3>5. View Details</h3>
+                    <p>Click "View Details" on any student card to see their full information in a popup.</p>
+                </div>
+
+                <div class="step">
+                    <h3>6. Leave Feedback</h3>
+                    <p>Rate the system and leave a comment on the Feedback page to help us improve.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+        <p>IT UDM Student Info Finder &mdash; Capstone Project</p>
+        <div class="team">
+            <div class="team-member">Ren Dominic Pastor</div>
+            <div class="team-member">Reynald John Flores</div>
+            <div class="team-member">Gerard Lapuz</div>
+        </div>
+    </footer>
+
+</div>
+
+
+
+<script>
+    /* ================= IN-MEMORY DATA ================= */
+    /* Kept in memory for this session (resets on page reload). */
+
+    let accounts = [
+        { name: "Reynald John Flores", email: "floresreynaldjohn@udm.ccs.edu.ph", password: "udmccs123", birth: "" }
+    ];
+    let currentUser = null;
+    let ratingValue = 0;
+
+    const firstNames = [
+        "Juan", "Maria", "Pedro", "Ana", "Jose", "Angelica", "Mark", "Kristine",
+        "Paolo", "Bea", "Carlo", "Nicole", "Miguel", "Samantha", "Rafael", "Andrea",
+        "Vincent", "Camille", "Gabriel", "Trisha", "Enrico", "Joyce", "Renz", "Faith",
+        "Aldrin", "Precious", "Kenneth", "Angel", "John", "Mary Grace"
+    ];
+
+    const lastNames = [
+        "Dela Cruz", "Santos", "Reyes", "Garcia", "Torres", "Ramos", "Mendoza",
+        "Flores", "Bautista", "Aquino", "Castillo", "Villanueva", "Gonzales",
+        "Rivera", "Cruz", "Fernandez", "Salazar", "Domingo", "Manalo", "Pascual"
+    ];
+
+    const courses = ["BSIT", "BSCS", "BSIS"];
+    const sections = ["A", "B", "C", "D"];
+    // Auto-generated students: no 4th year, and at most 3 third-year students
+    const MAX_THIRD_YEAR = 3;
+    let autoThirdCount = 0;
+
+    function pickYear() {
+        const pool = ["1st Year", "2nd Year"];
+        if (autoThirdCount < MAX_THIRD_YEAR) pool.push("3rd Year");
+        return randomFrom(pool);
+    }
+
+    function randomFrom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateRandomStudent(forcedYear) {
+        const first = randomFrom(firstNames);
+        const last = randomFrom(lastNames);
+        const yearPrefix = 2021 + Math.floor(Math.random() * 4);
+        const idNum = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
+        const yearLevel = forcedYear || pickYear();
+        if (yearLevel === "3rd Year") autoThirdCount++;
+
+        return {
+            name: `${first} ${last}`,
+            first,
+            last,
+            id: `${yearPrefix}-${idNum}`,
+            // 3rd year auto-generated students are always BSIT
+            course: yearLevel === "3rd Year" ? "BSIT" : randomFrom(courses),
+            section: yearLevel.charAt(0) + randomFrom(sections),
+            year: yearLevel
+        };
+    }
+
+    function generateRandomStudents(count) {
+        for (let i = 0; i < count; i++) {
+            students.push(generateRandomStudent());
+        }
+        renderStudents();
+    }
+
+    let students = [];
+    // Exactly 3 third-year students, the rest are 1st/2nd year
+    for (let i = 0; i < MAX_THIRD_YEAR; i++) {
+        students.push(generateRandomStudent("3rd Year"));
+    }
+    for (let i = 0; i < 9; i++) {
+        students.push(generateRandomStudent());
+    }
+
+    // Sample reviews come only from 3rd year BSIT students
+    const sampleComments = [
+        { rating: 5, comment: "Super helpful for finding classmates' info!" },
+        { rating: 4, comment: "Simple to use and the search is fast." },
+        { rating: 5, comment: "Love the design, easy to navigate." }
+    ];
+
+    let feedbackEntries = [
+        { name: "Nadua, John Paul (BSIT 36)", rating: 5, comment: "Easy to use and helpful for finding classmates' info!", date: "Sample entry" }
+    ];
+
+    students
+        .filter(s => s.year === "3rd Year" && s.course === "BSIT")
+        .forEach((s, i) => {
+            const sample = sampleComments[i % sampleComments.length];
+            feedbackEntries.push({
+                name: `${s.last}, ${s.first} (${s.course} ${s.section})`,
+                rating: sample.rating,
+                comment: sample.comment,
+                date: "Sample entry"
+            });
+        });
+
+    /* ================= AUTH ================= */
+
+    function togglePassword(ids, show) {
+        ids.forEach(id => {
+            document.getElementById(id).type = show ? 'text' : 'password';
+        });
+    }
+
+    function showRegister() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('forgotPage').classList.add('hidden');
+        document.getElementById('registerPage').classList.remove('hidden');
+    }
+
+    function showLogin() {
+        document.getElementById('registerPage').classList.add('hidden');
+        document.getElementById('forgotPage').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+    }
+
+    function showForgot() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('registerPage').classList.add('hidden');
+        document.getElementById('forgotPage').classList.remove('hidden');
+        // Pre-fill the email if the user already typed it on the login page
+        const typed = document.getElementById('loginEmail').value.trim();
+        if (typed) document.getElementById('forgotEmail').value = typed;
+    }
+
+    function resetPassword() {
+        const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+        const newPass = document.getElementById('forgotNewPassword').value;
+        const confirmPass = document.getElementById('forgotConfirmPassword').value;
+        const errorEl = document.getElementById('forgotError');
+        const successEl = document.getElementById('forgotSuccess');
+
+        errorEl.classList.remove('show');
+        successEl.classList.remove('show');
+
+        if (!email || !newPass || !confirmPass) {
+            errorEl.textContent = "Please fill in all fields.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        const account = accounts.find(acc => acc.email === email);
+
+        if (!account) {
+            errorEl.textContent = "No account found with that email.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        if (newPass !== confirmPass) {
+            errorEl.textContent = "Passwords do not match.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        account.password = newPass;
+        successEl.classList.add('show');
+
+        setTimeout(() => {
+            successEl.classList.remove('show');
+            document.getElementById('forgotNewPassword').value = '';
+            document.getElementById('forgotConfirmPassword').value = '';
+            document.getElementById('loginEmail').value = email;
+            showLogin();
+        }, 1500);
+    }
+
+    function register() {
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+        const password = document.getElementById('registerPassword').value;
+        const birth = document.getElementById('registerBirth').value;
+        const errorEl = document.getElementById('registerError');
+        const successEl = document.getElementById('registerSuccess');
+
+        errorEl.classList.remove('show');
+        successEl.classList.remove('show');
+
+        if (!name || !email || !password || !birth) {
+            errorEl.textContent = "Please complete all fields.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        if (accounts.some(acc => acc.email === email)) {
+            errorEl.textContent = "An account with that email already exists.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        accounts.push({ name, email, password, birth });
+
+        successEl.classList.add('show');
+
+        document.getElementById('registerName').value = '';
+        document.getElementById('registerEmail').value = '';
+        document.getElementById('registerPassword').value = '';
+        document.getElementById('registerBirth').value = '';
+
+        setTimeout(() => {
+            successEl.classList.remove('show');
+            showLogin();
+        }, 1200);
+    }
+
+    function login() {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+        const errorEl = document.getElementById('loginError');
+
+        errorEl.classList.remove('show');
+
+        if (!email || !password) {
+            errorEl.textContent = "Please enter your email and password.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        const match = accounts.find(acc => acc.email === email && acc.password === password);
+
+        if (!match) {
+            errorEl.textContent = "Incorrect email or password, or no account exists yet.";
+            errorEl.classList.add('show');
+            return;
+        }
+
+        currentUser = match;
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        enterSystem();
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('mainSystem').classList.add('hidden');
+        document.getElementById('mainNav').classList.add('hidden');
+        document.getElementById('registerPage').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+    }
+
+    function enterSystem() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('registerPage').classList.add('hidden');
+        document.getElementById('mainSystem').classList.remove('hidden');
+        document.getElementById('mainNav').classList.remove('hidden');
+        document.getElementById('welcomeBanner').textContent =
+            "Welcome back, " + currentUser.name + "!";
+        showPage('home');
+        renderStudents();
+        renderFeedback();
+    }
+
+    /* ================= NAVIGATION ================= */
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+
+        document.querySelectorAll('#mainNav button[data-page]').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-page') === pageId);
+        });
+    }
+
+    /* ================= STUDENT FINDER ================= */
+
+    function addStudent() {
+        const name = document.getElementById('newStudentName').value.trim();
+        const id = document.getElementById('newStudentId').value.trim();
+        const course = document.getElementById('newStudentCourse').value.trim();
+        const section = document.getElementById('newStudentSection').value.trim();
+        const year = document.getElementById('newStudentYear').value.trim();
+        const errorEl = document.getElementById('addStudentError');
+
+        errorEl.classList.remove('show');
+
+        if (!name || !id) {
+            errorEl.classList.add('show');
+            return;
+        }
+
+        students.push({
+            name,
+            id,
+            course: course || "N/A",
+            section: section || "N/A",
+            year: year || "N/A"
+        });
+
+        document.getElementById('newStudentName').value = '';
+        document.getElementById('newStudentId').value = '';
+        document.getElementById('newStudentCourse').value = '';
+        document.getElementById('newStudentSection').value = '';
+        document.getElementById('newStudentYear').value = '';
+
+        renderStudents();
+    }
+
+    function removeStudent(id) {
+        students = students.filter(s => s.id !== id);
+        renderStudents();
+    }
+
+    function renderStudents() {
+        const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+        const grid = document.getElementById('studentGrid');
+        grid.innerHTML = '';
+
+        const filtered = students.filter(s => {
+            if (!query) return true;
+            return (
+                s.name.toLowerCase().includes(query) ||
+                s.id.toLowerCase().includes(query) ||
+                s.course.toLowerCase().includes(query) ||
+                s.section.toLowerCase().includes(query)
+            );
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p class="no-results">No students found.</p>';
+            return;
+        }
+
+        filtered.forEach(s => {
+            const initials = s.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            card.innerHTML = `
+                <div class="student-header">
+                    <div class="student-avatar">${initials}</div>
+                    <h3>${s.name}</h3>
+                </div>
+                <div class="student-info">
+                    <p><strong>ID:</strong> ${s.id}</p>
+                    <p><strong>Course:</strong> ${s.course}</p>
+                    <p><strong>Section:</strong> ${s.section}</p>
+                    <p><strong>Year:</strong> ${s.year}</p>
+                </div>
+                <button class="remove-btn" onclick="removeStudent('${s.id}')">Remove</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    /* ================= FEEDBACK ================= */
+
+    function setRating(value) {
+        ratingValue = value;
+        document.querySelectorAll('#starSelect span').forEach(star => {
+            star.classList.toggle('active', Number(star.getAttribute('data-value')) <= value);
+        });
+    }
+
+    function submitFeedback() {
+        const name = document.getElementById('feedbackName').value.trim();
+        const comment = document.getElementById('feedbackComment').value.trim();
+        const errorEl = document.getElementById('feedbackError');
+
+        errorEl.classList.remove('show');
+
+        if (!name || !comment || ratingValue === 0) {
+            errorEl.classList.add('show');
+            return;
+        }
+
+        feedbackEntries.unshift({
+            name,
+            rating: ratingValue,
+            comment,
+            date: new Date().toLocaleString()
+        });
+
+        document.getElementById('feedbackName').value = '';
+        document.getElementById('feedbackComment').value = '';
+        setRating(0);
+
+        renderFeedback();
+    }
+
+    function renderFeedback() {
+        const list = document.getElementById('feedbackList');
+        list.innerHTML = '';
+
+        feedbackEntries.forEach(f => {
+            const card = document.createElement('div');
+            card.className = 'feedback-card';
+            card.innerHTML = `
+                <div class="stars">${'&#9733;'.repeat(f.rating)}${'&#9734;'.repeat(5 - f.rating)}</div>
+                <strong>${f.name}</strong>
+                <p>${f.comment}</p>
+                <div class="feedback-meta">${f.date}</div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+</script>
+
+</body>
+</html>
